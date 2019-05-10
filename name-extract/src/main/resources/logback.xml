@@ -1,0 +1,14 @@
+<configuration scan="true">
+    <jmxConfigurator />
+    <!-- Log to the console for use inside a container. -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}[%thread] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the Logging output to info by default -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
