@@ -1,0 +1,5 @@
+{
+  "kafkaBootstrapServers": "kafka.default.svc.cluster.local:9092"
+}
+
+

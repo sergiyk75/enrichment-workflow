@@ -1,4 +1,4 @@
-package com.jsitelecom.enrichment;
+package com.jsitelecom.enrichment.dispatcher;
 
 import com.google.inject.AbstractModule;
 

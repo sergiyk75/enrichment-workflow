@@ -14,23 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jsitelecom.enrichment;
+package com.jsitelecom.enrichment.nameextract;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.jsitelecom.enrichment.actions.EnrichmentResultHandler;
-import com.jsitelecom.enrichment.actions.ItemEnrichmentRequestHandler;
+import com.jsitelecom.enrichment.common.Enrichment;
 import com.jsitelecom.enrichment.common.JsonSerde;
-import com.jsitelecom.enrichment.dtos.EnrichmentResult;
-import com.jsitelecom.enrichment.dtos.ItemEnrichmentRequest;
+import com.jsitelecom.enrichment.common.dtos.EnrichmentRequest;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.state.Stores;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,27 +43,24 @@ class Bootstrap
 {
     public static void main(String[] args) throws IOException
     {
-        String configPath = Preconditions.checkNotNull(args[0]);
+        String configPath = args.length > 0 ? args[0] : "local-run-config.json";
         String configJson = new String(Files.readAllBytes(Paths.get(configPath)));
         Config config = Config.fromJson(configJson);
         Injector injector = Guice.createInjector(new DependencyModule(config));
 
         Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "enrichment-dispatcher");
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "enrichment-name-extract");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.kafkaBootstrapServers);
 
-        final StreamsBuilder builder = new StreamsBuilder()
-                .addStateStore(Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(Enrichment.Store.ITEM), Serdes.Integer(), Serdes.String()));
+        final StreamsBuilder builder = new StreamsBuilder();
 
-        builder.stream(Enrichment.Topic.ITEM_ENRICHMENT_REQUESTS, Consumed.with(Serdes.String(), JsonSerde.getSerde(ItemEnrichmentRequest.class)))
-               .flatTransform(() -> injector.getInstance(ItemEnrichmentRequestHandler.class), Enrichment.Store.ITEM)
-               .to(Enrichment.Topic.ENRICHMENT_REQUESTS);
-
-        builder.stream(Enrichment.Topic.ENRICHMENT_RESULTS, Consumed.with(Serdes.String(), JsonSerde.getSerde(EnrichmentResult.class)))
-               .flatTransform(() -> injector.getInstance(EnrichmentResultHandler.class), Enrichment.Store.ITEM)
-               .to(Enrichment.Topic.ENRICHMENT_REQUESTS);
+        builder.stream(Enrichment.Topic.ENRICHMENT_REQUESTS, Consumed.with(Serdes.String(), JsonSerde.getSerde(EnrichmentRequest.class)))
+               .transformValues(() -> injector.getInstance(EnrichmentRequestHandler.class))
+               .to(Enrichment.Topic.ENRICHMENT_RESULTS);
 
         final Topology topology = builder.build();
+        System.out.println(topology.describe());
+
         final KafkaStreams streams = new KafkaStreams(topology, props);
 
         final CountDownLatch latch = new CountDownLatch(1);

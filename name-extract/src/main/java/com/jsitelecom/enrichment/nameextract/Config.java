@@ -1,4 +1,4 @@
-package com.jsitelecom.enrichment;
+package com.jsitelecom.enrichment.nameextract;
 
 import com.google.gson.Gson;
 

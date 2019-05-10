@@ -11,6 +11,14 @@
 
     <artifactId>text-extract</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.jsitelecom.enrichment</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>${project.artifactId}</finalName>
         <resources>

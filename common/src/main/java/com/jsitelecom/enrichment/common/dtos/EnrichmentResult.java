@@ -1,4 +1,4 @@
-package com.jsitelecom.enrichment.dtos;
+package com.jsitelecom.enrichment.common.dtos;
 
 import com.google.gson.annotations.SerializedName;
 

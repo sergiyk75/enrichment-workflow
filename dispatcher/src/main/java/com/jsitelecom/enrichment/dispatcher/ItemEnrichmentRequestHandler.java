@@ -1,8 +1,8 @@
-package com.jsitelecom.enrichment.actions;
+package com.jsitelecom.enrichment.dispatcher;
 
-import com.jsitelecom.enrichment.Enrichment;
-import com.jsitelecom.enrichment.dtos.EnrichmentRequest;
-import com.jsitelecom.enrichment.dtos.ItemEnrichmentRequest;
+import com.jsitelecom.enrichment.common.Enrichment;
+import com.jsitelecom.enrichment.common.dtos.EnrichmentRequest;
+import com.jsitelecom.enrichment.common.dtos.ItemEnrichmentRequest;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
 import org.apache.kafka.streams.processor.ProcessorContext;
